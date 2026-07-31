@@ -39,8 +39,12 @@ on Hermes' discovery path, the enable step lets it load.
 Prefer to install from git instead of PyPI:
 
 ```bash
-hermes plugins install Mozilla-Ocho/tabstack-hermes --enable
+hermes plugins install Mozilla-Ocho/tabstack-hermes/tabstack_hermes --enable
 ```
+
+The `/tabstack_hermes` suffix is the subdirectory holding the plugin: `plugin.yaml` sits next to the
+code so one directory serves both install paths. Hermes renames the installed directory to the
+manifest name, so it lands at `~/.hermes/plugins/tabstack/` either way.
 
 Confirm it loaded:
 

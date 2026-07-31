@@ -54,9 +54,9 @@ a change to `provider.py` or `__init__.py` works.
 
 ## Adding a tool
 
-Touch points in order: `schemas.py`, `tools.py`, `plugin.yaml`, `tests/test_tools.py`,
-`tests/test_host_integration.py`, then mirror it into the LangChain and TypeScript packages. Full
-detail in `AGENTS.md`.
+Touch points in order: `schemas.py`, `tools.py`, `plugin.yaml` (all inside `tabstack_hermes/`), then
+`tests/test_tools.py` and `tests/test_host_integration.py`, then mirror it into the LangChain and
+TypeScript packages. Full detail in `AGENTS.md`.
 
 ## Pull requests
 

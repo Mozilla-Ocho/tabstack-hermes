@@ -10,9 +10,8 @@ through Hermes' plugin API. Hermes is Python, so this is a Python package, separ
 TypeScript integrations monorepo.
 
 ```
-plugin.yaml            manifest, read by Hermes when the repo is cloned into ~/.hermes/plugins/
-__init__.py            shim for that same clone path: re-exports register from tabstack_hermes
-tabstack_hermes/
+tabstack_hermes/       the plugin directory: what Hermes copies into ~/.hermes/plugins/tabstack/
+  plugin.yaml          manifest, read by Hermes on the directory-install path
   __init__.py          register(ctx): the only host entry point
   client.py            lazy, thread-safe AsyncTabstack singleton + key resolution
   errors.py            exception -> {"error": ..., "status": ...} payloads
@@ -29,11 +28,18 @@ tests/                 pytest, no network
   `__init__.py` (registration) and `provider.py` (which must subclass the host ABC).
 - **`provider.py` is a thin shell.** The extraction body lives in `tools.extract_urls`, so provider
   behaviour is tested without `hermes-agent`; only the class glue skips when the host is absent.
-- **Two install paths, one code path.** The root `__init__.py` + `plugin.yaml` serve
-  `hermes plugins install owner/repo` (Hermes imports the `__init__.py` next to `plugin.yaml`, with
-  the plugin directory on the module's `__path__`, so the relative import resolves). The wheel ships
-  only `tabstack_hermes` and is found through the `hermes_agent.plugins` entry point. Intra-package
-  imports must stay relative so both paths work.
+- **Two install paths, one directory.** `tabstack_hermes/` is simultaneously the Python package (found
+  through the `hermes_agent.plugins` entry point on a pip install) and the plugin directory (copied to
+  `~/.hermes/plugins/tabstack/` by
+  `hermes plugins install Mozilla-Ocho/tabstack-hermes/tabstack_hermes`, which is why `plugin.yaml`
+  lives inside it). Intra-package imports must stay relative: on the directory path the module is
+  imported as `hermes_plugins.tabstack` with that directory on its `__path__`, so an absolute
+  `tabstack_hermes.*` import would not resolve.
+- **Never add an `__init__.py` at the repo root.** An earlier layout put a re-export shim there so the
+  repo could be cloned wholesale into `~/.hermes/plugins/`. It made pytest treat the repo root as a
+  package, which only works when the checkout directory name is a valid Python identifier: green
+  locally in a directory called `hermes`, 40 collection errors in CI where the checkout is
+  `tabstack-hermes` (`ImportError: attempted relative import with no known parent package`).
 
 ## Hard rules
 
@@ -119,7 +125,7 @@ Stub `tabstack_hermes.tools.get_async_client` before calling `registry.dispatch(
 
 1. `schemas.py`: add the name to `TOOL_NAMES`, plus its description, emoji, and JSON Schema.
 2. `tools.py`: add the async handler and register it in `HANDLERS`.
-3. `plugin.yaml`: add the name to `provides_tools`.
+3. `tabstack_hermes/plugin.yaml`: add the name to `provides_tools`.
 4. `tests/test_tools.py`: happy path, an error payload path, and argument forwarding.
 5. `tests/test_host_integration.py`: add the name to the expected toolset list.
 6. Mirror the tool into `langchain-tabstack` and `@tabstack/integrations-core` so the three stay in
@@ -144,6 +150,6 @@ Confirmed against hermes-agent 0.19.0:
 - Confirm the `tabstack>=2.6.1` floor matches the intended SDK line.
 - `hermes-agent` must stay out of `dependencies`: it is the host, and pulling in its exact-pinned
   dependency set would wreck any environment that only wants this plugin.
-- Bump `version` in **both** `pyproject.toml` and `plugin.yaml`, plus `__version__` in
+- Bump `version` in **both** `pyproject.toml` and `tabstack_hermes/plugin.yaml`, plus `__version__` in
   `tabstack_hermes/__init__.py`. The manifest version is what `hermes plugins list` shows for a
   git-cloned install.

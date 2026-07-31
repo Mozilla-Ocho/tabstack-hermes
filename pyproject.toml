@@ -46,12 +46,13 @@ Documentation = "https://docs.tabstack.ai"
 Source = "https://github.com/Mozilla-Ocho/tabstack-hermes"
 
 [tool.hatch.build.targets.wheel]
+# plugin.yaml lives inside the package and ships with it. Hermes ignores it for a
+# pip install (the entry point carries the plugin name), but keeping the manifest
+# next to the code means one directory serves both install paths.
 packages = ["tabstack_hermes"]
 
 [tool.hatch.build.targets.sdist]
-# The root __init__.py and plugin.yaml exist for the git-clone install path
-# (`hermes plugins install owner/repo`), not for the wheel.
-include = ["tabstack_hermes", "tests", "plugin.yaml", "__init__.py", "README.md"]
+include = ["tabstack_hermes", "tests", "README.md"]
 
 [tool.ruff]
 line-length = 100

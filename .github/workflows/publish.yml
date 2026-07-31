@@ -52,10 +52,10 @@ jobs:
           sed -i 's/^version = ".*"/version = "'"$VERSION"'"/' pyproject.toml
           sed -i 's/^__version__ = ".*"/__version__ = "'"$VERSION"'"/' tabstack_hermes/__init__.py
           # plugin.yaml is what `hermes plugins list` shows for a git-cloned install.
-          sed -i 's/^version: .*/version: '"$VERSION"'/' plugin.yaml
+          sed -i 's/^version: .*/version: '"$VERSION"'/' tabstack_hermes/plugin.yaml
           echo "pyproject.toml:"; grep '^version = ' pyproject.toml
           echo "__init__.py:"; grep '^__version__ = ' tabstack_hermes/__init__.py
-          echo "plugin.yaml:"; grep '^version: ' plugin.yaml
+          echo "plugin.yaml:"; grep '^version: ' tabstack_hermes/plugin.yaml
 
       - name: Install build tooling
         run: |
