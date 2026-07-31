@@ -1,0 +1,73 @@
+name: Test
+
+# Reusable workflow. Called by publish.yml and runs directly on PRs / pushes.
+on:
+  workflow_call:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Test Check
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # Floor and ceiling follow the host: hermes-agent requires >=3.11,<3.14.
+        python-version: ["3.11", "3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+
+      - name: Install package and test dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[test]"
+
+      # hermes-agent is absent here, so the web provider and host integration
+      # tests skip. The host job below is the one that exercises them.
+      - name: Test
+        run: pytest -q
+
+  host:
+    name: Host Integration (hermes-agent)
+    runs-on: ubuntu-latest
+    # Not a merge or release gate on purpose: hermes-agent is the host process,
+    # not a dependency, and it pins its own dependency set exactly. An upstream
+    # release can break this install for reasons that have nothing to do with
+    # this plugin. Read it as a signal, not a blocker; the `test` job above is
+    # the gate.
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install package, test dependencies, and the host
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[test]" hermes-agent
+
+      # With the host installed, tests/test_provider.py exercises the real
+      # WebSearchProvider ABC and tests/test_host_integration.py drives Hermes'
+      # own plugin loader, tool registry, and web provider registry.
+      - name: Test with host
+        run: pytest -q
+
+      - name: Show what ran against the host
+        run: |
+          pip show hermes-agent | head -2
+          pytest -q tests/test_host_integration.py -v --no-header

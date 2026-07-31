@@ -1,0 +1,66 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "tabstack-hermes"
+version = "0.1.0"
+description = "Tabstack plugin for Hermes Agent. Schema-enforced web extraction, research, AI transformation, and browser automation, plus a Tabstack web extract backend."
+readme = "README.md"
+# Floor follows the host: hermes-agent requires >=3.11,<3.14.
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [{ name = "Tabstack" }]
+keywords = ["tabstack", "hermes", "hermes-agent", "plugin", "agent", "web-scraping", "extraction"]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+]
+dependencies = [
+  "tabstack>=2.6.1",
+]
+
+# hermes-agent is deliberately absent: it is the host process, not a dependency.
+# Installing it from here would pin its exact-pinned dependency set into any
+# environment that only wants the plugin package.
+[project.optional-dependencies]
+test = ["pytest>=8", "pytest-asyncio>=0.24"]
+dev = ["ruff>=0.6"]
+
+# Hermes discovers pip-installed plugins through this entry-point group. The value
+# is the *module*: the loader imports it and then looks up `register` on it, so
+# pointing at `tabstack_hermes:register` would hand it a function with no
+# `.register` attribute and the plugin would load as "no register() function".
+# The entry-point name is the plugin key used by `hermes plugins enable`.
+[project.entry-points."hermes_agent.plugins"]
+tabstack = "tabstack_hermes"
+
+[project.urls]
+Homepage = "https://tabstack.ai"
+Documentation = "https://docs.tabstack.ai"
+Source = "https://github.com/Mozilla-Ocho/tabstack-hermes"
+
+[tool.hatch.build.targets.wheel]
+packages = ["tabstack_hermes"]
+
+[tool.hatch.build.targets.sdist]
+# The root __init__.py and plugin.yaml exist for the git-clone install path
+# (`hermes plugins install owner/repo`), not for the wheel.
+include = ["tabstack_hermes", "tests", "plugin.yaml", "__init__.py", "README.md"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+asyncio_mode = "auto"

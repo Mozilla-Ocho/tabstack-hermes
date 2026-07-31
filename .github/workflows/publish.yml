@@ -1,0 +1,100 @@
+name: Publish to PyPI
+
+# Tag-driven publishing: create a GitHub Release whose tag is vX.Y.Z. The tag is
+# the source of truth for the version and is written into pyproject.toml,
+# tabstack_hermes/__init__.py, and plugin.yaml at build time (not committed back).
+# Publishing uses PyPI trusted publishing (OIDC), so no API token is stored here.
+on:
+  release:
+    types: [created]
+
+permissions:
+  id-token: write # Required for trusted publishing to PyPI
+  contents: read
+
+jobs:
+  # Lint must pass before publishing.
+  lint:
+    name: Lint Check
+    uses: ./.github/workflows/lint.yml
+    permissions:
+      contents: read
+
+  # Tests must pass on every supported Python version before publishing.
+  test:
+    name: Test Check
+    uses: ./.github/workflows/test.yml
+    permissions:
+      contents: read
+
+  publish:
+    name: Build and Publish
+    needs: [lint, test]
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write # Required for trusted publishing to PyPI
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Set version from release tag
+        run: |
+          VERSION=${GITHUB_REF#refs/tags/v}
+          echo "Releasing version: $VERSION"
+          # Anchored to line start so `target-version` / `requires-python` and the
+          # manifest's `manifest_version` are left alone.
+          sed -i 's/^version = ".*"/version = "'"$VERSION"'"/' pyproject.toml
+          sed -i 's/^__version__ = ".*"/__version__ = "'"$VERSION"'"/' tabstack_hermes/__init__.py
+          # plugin.yaml is what `hermes plugins list` shows for a git-cloned install.
+          sed -i 's/^version: .*/version: '"$VERSION"'/' plugin.yaml
+          echo "pyproject.toml:"; grep '^version = ' pyproject.toml
+          echo "__init__.py:"; grep '^__version__ = ' tabstack_hermes/__init__.py
+          echo "plugin.yaml:"; grep '^version: ' plugin.yaml
+
+      - name: Install build tooling
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install build twine
+
+      - name: Build package
+        run: python -m build
+
+      - name: Check package
+        run: python -m twine check dist/*
+
+      - name: Publish to TestPyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          repository-url: https://test.pypi.org/legacy/
+          attestations: false
+
+      - name: Verify TestPyPI installation
+        run: |
+          VERSION=${GITHUB_REF#refs/tags/v}
+          echo "Waiting for TestPyPI to process the upload..."
+          sleep 30
+          python -m pip install \
+            --index-url https://test.pypi.org/simple/ \
+            --extra-index-url https://pypi.org/simple/ \
+            "tabstack-hermes==$VERSION"
+          python -c "import tabstack_hermes; print(f'Imported tabstack-hermes {tabstack_hermes.__version__}')"
+          # The entry point is how Hermes discovers a pip-installed plugin, so a
+          # broken or missing one makes the release useless even though it imports.
+          python - <<'PY'
+          import importlib.metadata as md
+          selected = tuple(md.entry_points().select(group="hermes_agent.plugins"))
+          eps = {ep.name: ep.value for ep in selected}
+          assert eps.get("tabstack") == "tabstack_hermes", eps
+          module = next(ep for ep in selected if ep.name == "tabstack").load()
+          assert callable(getattr(module, "register", None)), "entry point exposes no register()"
+          print("entry point ok:", eps)
+          PY
+
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1

@@ -1,0 +1,16 @@
+manifest_version: 1
+name: tabstack
+version: 0.1.0
+description: "Tabstack web intelligence for Hermes: schema-enforced extraction, multi-source research, AI transformation, and browser automation, plus a `tabstack` web extract backend. Requires TABSTACK_API_KEY (get one at https://console.tabstack.ai)."
+author: Tabstack
+kind: standalone
+requires_env:
+  - TABSTACK_API_KEY
+provides_tools:
+  - extract_structured_data
+  - extract_page_content
+  - research_question
+  - generate_structured_data
+  - automate_browser_task
+provides_web_providers:
+  - tabstack
