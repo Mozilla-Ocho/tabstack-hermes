@@ -1,5 +1,10 @@
 # tabstack-hermes
 
+[![PyPI](https://img.shields.io/pypi/v/tabstack-hermes.svg)](https://pypi.org/project/tabstack-hermes/)
+[![Python versions](https://img.shields.io/pypi/pyversions/tabstack-hermes.svg)](https://pypi.org/project/tabstack-hermes/)
+[![Tests](https://github.com/Mozilla-Ocho/tabstack-hermes/actions/workflows/test.yml/badge.svg)](https://github.com/Mozilla-Ocho/tabstack-hermes/actions/workflows/test.yml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
+
 Tabstack web intelligence for [Hermes Agent](https://hermes-agent.nousresearch.com). Five native
 tools in a `tabstack` toolset, plus a `tabstack` backend for Hermes' own `web_extract` tool, all
 backed by the official [Tabstack SDK](https://pypi.org/project/tabstack/).
@@ -152,6 +157,9 @@ provider registry. They skip without it.
 Releases are cut from a GitHub Release tagged `vX.Y.Z`: the tag's version is written into
 `pyproject.toml`, `plugin.yaml`, and `__version__` at build time, and the package is published to
 PyPI through trusted publishing after lint and tests pass.
+
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for the contributor guide and [AGENTS.md](./AGENTS.md) for the
+architecture, conventions, and the host API surface this plugin depends on.
 
 ## Links
 
