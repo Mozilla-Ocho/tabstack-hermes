@@ -129,22 +129,6 @@ supplied one:
 {"error": "Extract failed for https://example.com", "status": 429}
 ```
 
-## Alternative: MCP
-
-Tabstack's CLI ships a stdio MCP server, which is a config-only path with no plugin install:
-
-```yaml
-# ~/.hermes/config.yaml
-mcp_servers:
-  tabstack:
-    command: "tabstack"
-    args: ["mcp"]
-```
-
-That exposes the raw API surface as `mcp_tabstack_*` tools. This plugin is the better default: the
-tool names match Tabstack's other framework integrations, the tools are one toolset the user can
-toggle, there is no subprocess per session, and `web_extract` can route through Tabstack.
-
 ## Development
 
 ```bash
