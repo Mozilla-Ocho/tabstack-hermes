@@ -11,7 +11,7 @@ readme = "README.md"
 requires-python = ">=3.11"
 license = { text = "MIT" }
 authors = [{ name = "Tabstack" }]
-keywords = ["tabstack", "hermes", "hermes-agent", "plugin", "agent", "web-scraping", "extraction"]
+keywords = ["tabstack", "hermes", "hermes-agent", "plugin", "agent", "web-research", "web-extraction", "browser-automation", "extraction"]
 classifiers = [
   "Development Status :: 4 - Beta",
   "Intended Audience :: Developers",
