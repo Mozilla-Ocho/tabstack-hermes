@@ -130,15 +130,24 @@ async def test_research_question_returns_answer_and_sources(fake_client) -> None
         "answer": "The answer",
         "sources": [{"title": "Source A", "url": "https://a.example"}],
     }
-    assert client.calls[0][1] == {"query": "why", "mode": "balanced"}
+    assert client.calls[0][1] == {"query": "why", "mode": "fast"}
+
+
+async def test_research_mode_defaults_to_fast(fake_client) -> None:
+    # "balanced" needs a Team or Pro plan, so defaulting to it breaks Trial and Starter keys.
+    client = fake_client(FakeStream([research_complete("x", [])]))
+
+    await tools.research_question({"query": "why"})
+
+    assert client.calls[0][1]["mode"] == "fast"
 
 
 async def test_research_mode_and_nocache_forwarded(fake_client) -> None:
     client = fake_client(FakeStream([research_complete("x", [])]))
 
-    await tools.research_question({"query": "why", "mode": "fast", "nocache": True})
+    await tools.research_question({"query": "why", "mode": "balanced", "nocache": True})
 
-    assert client.calls[0][1] == {"query": "why", "mode": "fast", "nocache": True}
+    assert client.calls[0][1] == {"query": "why", "mode": "balanced", "nocache": True}
 
 
 async def test_research_error_event_becomes_an_error_payload(fake_client) -> None:

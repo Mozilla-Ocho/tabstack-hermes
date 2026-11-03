@@ -78,7 +78,10 @@ Passed only when the model provides them, so omitting them keeps Tabstack's defa
     browser rendering).
   - `nocache`: `true` to bypass the cache.
   - `country`: ISO 3166-1 alpha-2 code (for example `"US"`) for geotargeted fetches.
-- `research_question`: `mode` (`"fast"` | `"balanced"`), `nocache`.
+- `research_question`:
+  - `mode`: `"fast"` (default) | `"balanced"`. `"balanced"` is more thorough and needs a Team or
+    Pro plan.
+  - `nocache`: `true` to bypass the cache.
 - `automate_browser_task`: `data` (context for form filling), `country`, `max_iterations`,
   `max_validation_attempts`.
 
