@@ -142,7 +142,8 @@ SCHEMAS: dict[str, dict[str, Any]] = {
                 "type": "string",
                 "enum": ["fast", "balanced"],
                 "description": (
-                    'Optional research mode: "fast" (quick) or "balanced" (default, more thorough)'
+                    'Optional research mode: "fast" (default, quickest and cheapest) or '
+                    '"balanced" (more thorough, Team and Pro plans only)'
                 ),
             },
             "nocache": _NOCACHE,

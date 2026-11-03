@@ -102,7 +102,7 @@ def _fetch_options(args: dict[str, Any]) -> dict[str, Any]:
 def _research_kwargs(args: dict[str, Any]) -> dict[str, Any]:
     kwargs: dict[str, Any] = {
         "query": _require_str(args, "query"),
-        "mode": _optional_str(args, "mode") or "balanced",
+        "mode": _optional_str(args, "mode") or "fast",
     }
     nocache = args.get("nocache")
     if isinstance(nocache, bool):
