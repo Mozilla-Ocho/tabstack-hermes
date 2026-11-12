@@ -165,6 +165,13 @@ PyPI through trusted publishing after lint and tests pass.
 See [CONTRIBUTING.md](./CONTRIBUTING.md) for the contributor guide and [AGENTS.md](./AGENTS.md) for the
 architecture, conventions, and the host API surface this plugin depends on.
 
+## Feedback
+
+Report a problem or request a feature in
+[tabstack-feedback](https://github.com/Mozilla-Ocho/tabstack-feedback/issues/new/choose). Include
+the plugin version and the `x-trace-id` from the failing response when relevant. Never paste API
+keys or personal data into an issue.
+
 ## Links
 
 - [Tabstack docs](https://docs.tabstack.ai)
