@@ -167,9 +167,9 @@ architecture, conventions, and the host API surface this plugin depends on.
 
 ## Feedback
 
-Report a problem or request a feature in
+Report a Tabstack problem or request a feature in
 [tabstack-feedback](https://github.com/Mozilla-Ocho/tabstack-feedback/issues/new/choose). Include
-the plugin version, the tool name, and the `error` (and `status`, if present) the tool returned. Never paste API
+the plugin version, the tool name, and the `error` (and `status`, if present) the tool returned. For a bug in this plugin's own code, open an issue in this repo. Never paste API
 keys or personal data into an issue.
 
 ## Links
